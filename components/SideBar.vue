@@ -9,16 +9,25 @@
             </div>
             <nav class="sidebar-menu">
               <ul>
-                <li class="sidebar-item">
-                 
+                <li
+                  class="sidebar-item"
+                  :class="{ active: selected === 'home' }"
+                  @click="selected = 'home'"
+                >
                   <span>home</span>
                 </li>
-                <li class="sidebar-item active">
-                
+                <li
+                  class="sidebar-item"
+                  :class="{ active: selected === 'projects' }"
+                  @click="selected = 'projects'"
+                >
                   <span>projects</span>
                 </li>
-                <li class="sidebar-item">
-                 
+                <li
+                  class="sidebar-item"
+                  :class="{ active: selected === 'events' }"
+                  @click="selected = 'events'"
+                >
                   <span>events</span>
                 </li>
               </ul>
@@ -31,7 +40,7 @@
       <div class="main">
         <main class="main-content">
           <div class="main-inner">
-            
+            <component :is="currentComponent" />
           </div>
         </main>
       </div>
@@ -40,7 +49,20 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 
+import Home from '~/components/Home.vue'
+import Projects from '~/components/Projects.vue'
+import Events from '~/components/Events.vue'
+
+const selected = ref('home') 
+
+const currentComponent = computed(() => {
+  if (selected.value === 'home') return Home
+  if (selected.value === 'projects') return Projects
+  if (selected.value === 'events') return Events
+  return null
+})
 </script>
 
 <style scoped>
@@ -122,11 +144,13 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: #d1d5db;
+  background-color: #f1f2f3;
   min-width: 0;
   overflow: hidden;
 }
-
+.main-content::-webkit-scrollbar {
+  display: none;
+}
 .main-content {
   position: relative;
   z-index: 0;

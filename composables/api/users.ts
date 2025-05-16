@@ -3,7 +3,7 @@ export const useUsersApi = () => {
     const baseURL = config.public.apiBase
     console.log('Base URL:', baseURL)
   
-    // Obtener todos los usuarios
+
     const getUsers = async () => {
       const { data, error } = await useFetch(`${baseURL}/users`, {
         method: 'GET',
@@ -11,8 +11,7 @@ export const useUsersApi = () => {
       })
       return { data, error }
     }
-  
-    // Obtener un usuario específico por ID
+
     const getUser = async (id: number | string) => {
       const { data, error } = await useFetch(`${baseURL}/users/${id}`, {
         method: 'GET',
@@ -21,7 +20,7 @@ export const useUsersApi = () => {
       return { data, error }
     }
   
-    // Crear un nuevo usuario (registro)
+ 
     const createUser = async (userData: Record<string, any>) => {
       const { data, error } = await useFetch(`${baseURL}/users`, {
         method: 'POST',
@@ -30,8 +29,7 @@ export const useUsersApi = () => {
       })
       return { data, error }
     }
-  
-    // Actualizar un usuario
+
     const updateUser = async (id: number | string, userData: Record<string, any>) => {
       const { data, error } = await useFetch(`${baseURL}/users/${id}`, {
         method: 'PUT',
@@ -41,7 +39,6 @@ export const useUsersApi = () => {
       return { data, error }
     }
   
-    // Eliminar un usuario
     const deleteUser = async (id: number | string) => {
       const { data, error } = await useFetch(`${baseURL}/users/${id}`, {
         method: 'DELETE',
@@ -50,7 +47,6 @@ export const useUsersApi = () => {
       return { data, error }
     }
   
-    // Login del usuario
     const loginUser = async (email: string, password: string) => {
       const { data, error } = await useFetch(`${baseURL}/login`, {
         method: 'POST',
