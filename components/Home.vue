@@ -1,12 +1,12 @@
 <template>
-        <Header 
-    title="Home"
-    ></Header>
-    <div class="layout">
-      <p>esto es home</p> 
-        </div>
-                
+  <Header title="Home" />
+
+
 
 </template>
+
 <script setup>
 </script>
+
+<style scoped>
+</style>

@@ -28,8 +28,17 @@ const handleLogin = async () => {
     error.value = 'Error al iniciar sesión'
     console.error(loginError.value)
   } else {
-    console.log('Usuario autenticado:', data.value)
-    router.push('/')
+    const token = data.value?.data?.accessToken
+    console.log('Token generado:', token)
+
+    if (token) {
+      localStorage.setItem('authToken', token)
+      router.push('/')
+    } else {
+      error.value = 'Token no recibido del servidor'
+    }
   }
 }
+
+
 </script>
