@@ -1,7 +1,9 @@
 <template>
   <Header title="Projects" />
   <img src="/images/wk1.png" alt="Projects" class="project-img" />
-  <p v-if="isLoading">Cargando proyectos…</p>
+<div v-if="isLoading" class="spinner-container">
+  <div class="spinner"></div>
+</div>
 
   <p v-else-if="error" class="error">{{ error }}</p>
 
@@ -122,4 +124,29 @@ onMounted(async () => {
   margin-left: 5%;
   margin-top:5%;
 }
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px; /* o el alto que desees mientras carga */
+}
+
+.spinner {
+  border: 4px solid #cce6ff;
+  border-top: 4px solid #4682B4;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 </style>

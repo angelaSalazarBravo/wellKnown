@@ -23,7 +23,9 @@
       <div class="main">
         <main class="main-content">
           <div class="main-inner">
-            <div v-if="isLoading">Cargando proyecto...</div>
+<div v-if="isLoading" class="spinner-container">
+  <div class="spinner"></div>
+</div>
 
             <div v-else-if="error" class="error">{{ error }}</div>
 
@@ -290,5 +292,29 @@ onMounted(async () => {
   text-align: center;
   color: crimson;
   margin-top: 2rem;
+}
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px; /* o el alto que desees mientras carga */
+}
+
+.spinner {
+  border: 4px solid #cce6ff;
+  border-top: 4px solid #4682B4;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

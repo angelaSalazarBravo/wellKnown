@@ -140,6 +140,11 @@ const currentComponent = computed(() => {
   background-color: #d1e8e2;
 }
 
+¡
+
+.sidebar-item.active {
+  background-color: #399991;
+}
 
 
 .icon {

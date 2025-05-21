@@ -43,7 +43,7 @@
           </li>
           <li v-if="selectedDay.events.length === 0">No events</li>
         </ul>
-        <button @click="selectedDay = null" class="close-button">Cerrar</button>
+        <button @click="selectedDay = null" class="close-button">Close</button>
       </div>
     </transition>
   </div>
@@ -222,7 +222,7 @@ function getFirstEventTitle(day) {
 .day-view {
   padding: 1rem;
   background-color: #ffffff; /* Day view background */
-  border-radius: 0 0 10px 10px; /* Rounded bottom corners */
+  border-radius: 10px; /* Rounded bottom corners */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
