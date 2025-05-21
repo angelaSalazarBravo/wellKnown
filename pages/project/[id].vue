@@ -34,22 +34,23 @@
                 <strong>Inicio:</strong> {{ formatDate(project.start_date) }}
                 <strong>Fin:</strong> {{ formatDate(project.end_date) }}
               </p>
+              <Header title="Project Events" />
             </div>
 
             <div v-else class="error">Proyecto no encontrado</div>
-            <div v-if="events.length > 0" class="events-section">
-            <h2>Eventos</h2>
-              <ul>
-                <li v-for="event in events" :key="event.id">
+
+              <div v-if="events.length > 0" class="events-section">
+                
+                <div v-for="event in events" :key="event.id" class="event-card">
                   <strong>{{ event.title }}</strong><br />
                   <small>
-                    Desde: {{ formatDate(event.start_date) }} <br />
-                    Hasta: {{ formatDate(event.end_date) }}
+                    <strong>Start Date: </strong>{{ formatDate(event.start_date) }} <br />
+                    <strong>End Date:</strong> {{ formatDate(event.end_date) }}
                   </small>
                   <p>{{ event.description }}</p>
-                </li>
-              </ul>
-            </div>
+                </div>
+              </div>
+
 
             
           </div>
@@ -109,6 +110,13 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+
+@font-face {
+  font-family: 'title';
+  src: url('/fonts/Title.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 .layout {
   font-family: sans-serif;
 }
@@ -151,9 +159,10 @@ onMounted(async () => {
 }
 
 .sidebar-title {
-  font-size: 1.5rem;
+  font-family: title;
+  font-size: 2rem;
   font-weight: bold;
-  color: #1a1a1a;
+  color: #130d61;
 }
 
 .sidebar-menu ul {
@@ -214,27 +223,69 @@ onMounted(async () => {
   padding-left: 2.5rem;
 }
 
-/* Project detail 
-.project-detail {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  background-color: white;
+ .project-detail {
+    border-radius: 8px;
+  }
+
+ .project-detail h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #20217c;
+  }
+
+  .project-detail p {
+    font-size: 1.1rem;
+    color: #20217c;
+    line-height: 1.5;
+  }
+.events-section {
+  
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  max-width: 100%;
+  padding-right: 2.5rem;
+}
+.event-card:hover {
+  transform: scale(1.02);
+}
+
+.events-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.event-card {
+  background: linear-gradient(to bottom, #87CEEB, #4682B4);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+
 }
 
-.project-detail h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+.event-card strong {
+  font-size: 1.2rem;
+  color: #fff;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
-.project-detail p {
+.event-card small {
+  font-size: 0.9rem;
+  color: #e0e0e0;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.event-card p {
   font-size: 1.1rem;
-  color: #333;
+  color: #fff;
   line-height: 1.5;
 }
-*/
+
 .error {
   text-align: center;
   color: crimson;

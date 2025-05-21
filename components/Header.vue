@@ -15,6 +15,12 @@ defineProps({
 </script>
 
 <style scoped> 
+@font-face {
+  font-family: 'title';
+  src: url('/fonts/Title.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 .header {
   top: 0;
   right: 0;
@@ -26,6 +32,7 @@ defineProps({
   line-height: 1.2;
 }
 p {
+  font-family : title;
   font-size: 1.5em;
   font-weight: bold;
 }

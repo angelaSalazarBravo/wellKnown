@@ -14,6 +14,7 @@
                   :class="{ active: selected === 'home' }"
                   @click="selected = 'home'"
                 >
+                 <img src="/icons/home.png" alt="Home Icon" class="icon" />
                   <span>home</span>
                 </li>
                 <li
@@ -21,6 +22,7 @@
                   :class="{ active: selected === 'projects' }"
                   @click="selected = 'projects'"
                 >
+                  <img src="/icons/projects.png" alt="Projects Icon" class="icon" />
                   <span>projects</span>
                 </li>
                 <li
@@ -28,6 +30,7 @@
                   :class="{ active: selected === 'events' }"
                   @click="selected = 'events'"
                 >
+                 <img src="/icons/events.png" alt="Events Icon" class="icon" />
                   <span>events</span>
                 </li>
               </ul>
@@ -50,7 +53,6 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-
 import Home from '~/components/Home.vue'
 import Projects from '~/components/Projects.vue'
 import Events from '~/components/Events.vue'
@@ -66,6 +68,18 @@ const currentComponent = computed(() => {
 </script>
 
 <style scoped>
+@font-face {
+  font-family: 'title';
+  src: url('/fonts/Title.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+.sidebar-title{
+  font-family: title;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #130d61;
+}
 .layout {
   font-family: sans-serif;
 }
@@ -105,12 +119,6 @@ const currentComponent = computed(() => {
   align-items: center;
   padding: 0 1.5rem;
   margin-bottom: 2rem;
-}
-
-.sidebar-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #1a1a1a;
 }
 
 .sidebar-menu ul {

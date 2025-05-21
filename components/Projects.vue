@@ -1,11 +1,12 @@
 <template>
   <Header title="Projects" />
-
+  <img src="/images/wk1.png" alt="Projects" class="project-img" />
   <p v-if="isLoading">Cargando proyectos…</p>
 
   <p v-else-if="error" class="error">{{ error }}</p>
 
   <div v-else class="projects-grid">
+     
     <router-link
       v-for="project in projects"
       :key="project.id"
@@ -64,44 +65,61 @@ onMounted(async () => {
 
 <style scoped>
 .projects-grid {
+  margin-top: 2rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  padding: 2rem;
+  max-width: 100%;
+  padding: 0 2.5rem 2.5rem 2.5rem;
+
 }
+
 .project-card {
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 0.75rem;
+  background: linear-gradient(to bottom, #87CEEB, #4682B4);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
-  color: inherit;
   text-decoration: none;
+  color: #fff;
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s ease;
+  
 }
+
 .project-card:hover {
   transform: scale(1.02);
-  background-color: #f9f9f9;
 }
+
 .project-title {
   font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
+  color: #fff;
 }
+
 .project-description {
-  font-size: 0.95rem;
-  margin-bottom: 0.75rem;
-  color: #444;
+  font-size: 1.1rem;
+  color: #fff;
+  line-height: 1.5;
   flex-grow: 1;
+  margin-bottom: 0.75rem;
 }
+
 .project-dates {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 0.9rem;
+  color: #e0e0e0;
 }
+
 .error {
   color: crimson;
   padding: 1rem 2rem;
+}
+.project-img{
+  width:90%;
+  height: 20%;
+  border-radius: 8px;
+  margin-left: 5%;
+  margin-top:5%;
 }
 </style>
