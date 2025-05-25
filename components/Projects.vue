@@ -1,6 +1,33 @@
 <template>
   <Header title="Projects" />
   <img src="/images/wk1.png" alt="Projects" class="project-img" />
+  <div v-if="isAdmin" class="admin-actions">
+    <button class="btn-add" @click="showModal = true">Crear Proyecto</button>
+  </div>
+<div v-if="showModal" class="modal-overlay">
+  <div class="modal-content">
+    <h2>Crear Proyecto</h2>
+    <form @submit.prevent="createProjectHandler">
+      <label>Nombre:</label>
+      <input v-model="newProject.name" required />
+
+      <label>Descripción:</label>
+      <textarea v-model="newProject.description" required></textarea>
+
+      <label>Inicio:</label>
+      <input type="date" v-model="newProject.start_date" required />
+
+      <label>Fin:</label>
+      <input type="date" v-model="newProject.end_date" required />
+
+      <div class="modal-buttons">
+        <button type="submit">Crear</button>
+        <button type="button" @click="showModal = false">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div v-if="isLoading" class="spinner-container">
   <div class="spinner"></div>
 </div>
@@ -30,12 +57,37 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '~/components/Header.vue'
 import { useProjectsApi } from '~/composables/api/projects'
+import { getLoggedUser } from '~/utils/auth'
+const { getProjects, createProject } = useProjectsApi()
 
+const user = getLoggedUser()
+const isAdmin = user?.role === 'admin'
 const projects = ref([] as any[])
 const isLoading = ref(false)
 const error = ref('')
 
-const { getProjects } = useProjectsApi()
+const showModal = ref(false)
+const newProject = ref({
+  name: '',
+  description: '',
+  start_date: '',
+  end_date: ''
+})
+
+const createProjectHandler = async () => {
+  try {
+    const payload = {
+      ...newProject.value,
+      created_by: user.id
+    }
+    await createProject(payload)
+    showModal.value = false
+    const response = await getProjects()
+    projects.value = Array.isArray(response) ? response : response.data
+  } catch (err) {
+    console.error('Error al crear proyecto:', err)
+  }
+}
 const router = useRouter()
 
 const formatDate = (dateStr: string) =>
@@ -148,5 +200,86 @@ onMounted(async () => {
     transform: rotate(360deg);
   }
 }
+.btn-add {
+  background-color: #4682B4;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  margin: 1rem 2.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
 
-</style>
+.btn-add:hover {
+  background-color: #356a95;
+}
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+}
+
+.modal-content h2 {
+  margin-bottom: 1rem;
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.modal-buttons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-buttons button[type='submit'] {
+  background-color: #4682B4;
+  color: white;
+}
+
+.modal-buttons button[type='button'] {
+  background-color: #ccc;
+  color: #333;
+}
+
+</style> 

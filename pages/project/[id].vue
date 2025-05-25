@@ -23,9 +23,9 @@
       <div class="main">
         <main class="main-content">
           <div class="main-inner">
-<div v-if="isLoading" class="spinner-container">
-  <div class="spinner"></div>
-</div>
+          <div v-if="isLoading" class="spinner-container">
+          <div class="spinner"></div>
+          </div>
 
             <div v-else-if="error" class="error">{{ error }}</div>
 
@@ -36,13 +36,13 @@
                 <strong>Inicio:</strong> {{ formatDate(project.start_date) }}
                 <strong>Fin:</strong> {{ formatDate(project.end_date) }}
               </p>
-              <Header title="Project Events" />
+              
             </div>
 
             <div v-else class="error">Proyecto no encontrado</div>
 
               <div v-if="events.length > 0" class="events-section">
-                
+                <Header title="Project Events" />
                 <div v-for="event in events" :key="event.id" class="event-card">
                   <strong>{{ event.title }}</strong><br />
                   <small>
@@ -241,12 +241,9 @@ onMounted(async () => {
     line-height: 1.5;
   }
 .events-section {
-  
   margin-top: 2rem;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  max-width: 100%;
+  max-width: 45%;
   padding-right: 2.5rem;
 }
 .event-card:hover {
@@ -263,9 +260,8 @@ onMounted(async () => {
   background: linear-gradient(to bottom, #87CEEB, #4682B4);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-
+  padding: 1rem;
+  margin-top:1.5rem;
 }
 
 .event-card strong {

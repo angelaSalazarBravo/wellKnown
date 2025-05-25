@@ -61,6 +61,9 @@ const loginUser = async (email: string, password: string) => {
   if (data.value?.data?.accessToken) {
     localStorage.setItem('token', data.value.data.accessToken)
     console.log('Token guardado:', data.value.data.accessToken)
+
+    localStorage.setItem('user', JSON.stringify(data.value.data.user))
+    console.log('Usuario guardado:', data.value.data.user)
   } else {
     console.error('Token no recibido del servidor')
   }
