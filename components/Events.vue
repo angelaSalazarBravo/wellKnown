@@ -165,7 +165,7 @@ function getFirstEventTitle(day) {
   max-width: 90%;
   margin: 5%;
   font-family: 'Arial', sans-serif;
-  background-color: #f0f8ff; /* Light background for contrast */
+  background-color: #f0f8ff; 
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -176,9 +176,9 @@ function getFirstEventTitle(day) {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background-color: #4682B4; /* Header background */
-  color: white; /* Text color */
-  border-radius: 10px 10px 0 0; /* Rounded top corners */
+  background-color: #4682B4; 
+  color: white; 
+  border-radius: 10px 10px 0 0; 
 }
 
 .weekdays,
@@ -192,9 +192,9 @@ function getFirstEventTitle(day) {
 .weekday {
   text-align: center;
   padding: 1rem;
-  background-color: #87CEEB; /* Weekday background */
-  color: white; /* Text color */
-  border-radius: 5px; /* Rounded corners */
+  background-color: #87CEEB;
+  color: white; 
+  border-radius: 5px;
 }
 
 .calendar-day,
@@ -204,11 +204,11 @@ function getFirstEventTitle(day) {
   border: 1px solid #ccc;
   min-height: 60px;
   cursor: pointer;
-  transition: background-color 0.3s; /* Smooth transition */
+  transition: background-color 0.3s; 
 }
 
 .calendar-day:hover {
-  background-color: #b0e0e6; /* Light hover effect */
+  background-color: #b0e0e6;
 }
 
 .dot {
@@ -221,8 +221,8 @@ function getFirstEventTitle(day) {
 
 .day-view {
   padding: 1rem;
-  background-color: #ffffff; /* Day view background */
-  border-radius: 10px; /* Rounded bottom corners */
+  background-color: #ffffff;
+  border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -248,16 +248,16 @@ function getFirstEventTitle(day) {
   display: block;
   margin: 2rem auto 0;
   padding: 0.5rem 1rem;
-  background: #4682B4; /* Close button background */
-  color: white; /* Text color */
+  background: #4682B4; 
+  color: white; 
   border: none;
-  border-radius: 5px; /* Rounded corners */
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s; /* Smooth transition */
+  transition: background-color 0.3s; 
 }
 
 .close-button:hover {
-  background: #5a9bd4; /* Darker shade on hover */
+  background: #5a9bd4; 
 }
 
 .fade-enter-active, .fade-leave-active {
@@ -274,7 +274,7 @@ function getFirstEventTitle(day) {
   overflow: hidden;
   text-overflow: ellipsis;
   border-radius: 5px;
-  background-color: #69caf0; /* Event title background */
+  background-color: #69caf0; 
 }
 
 </style>
