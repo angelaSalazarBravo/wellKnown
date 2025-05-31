@@ -43,42 +43,118 @@
           </li>
           <li v-if="selectedDay.events.length === 0">No events</li>
         </ul>
+        <button @click="showModal = true" class="create-event-button">Create Event</button>
         <button @click="selectedDay = null" class="close-button">Close</button>
       </div>
     </transition>
   </div>
+  <!-- Create Event Modal -->
+<div v-if="showModal" class="modal-overlay">
+  <div class="modal-content">
+    <h2>Create Event</h2>
+    <form @submit.prevent="createEventHandler">
+      <label>Title:</label>
+      <input v-model="newEvent.title" required />
+
+      <label>Description:</label>
+      <textarea v-model="newEvent.description" required></textarea>
+
+      <label>Start Date:</label>
+      <input class="datetime-local" type="datetime-local" v-model="newEvent.start_date" required />
+
+      <label>End Date:</label>
+      <input class="datetime-local" type="datetime-local" v-model="newEvent.end_date" required />
+
+        <label>Project:</label>
+        <select class="project-selector" v-model="newEvent.project_id" required>
+          <option disabled value="">Select a project</option>
+          <option v-for="project in projects" :key="project.id" :value="project.id">
+            {{ project.name }}
+          </option>
+        </select>
+      <div class="modal-buttons">
+        <button type="submit">Create</button>
+        <button type="button" @click="showModal = false">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCalendarEventsApi } from '~/composables/api/calendar-events'
+import { getLoggedUser } from '~/utils/auth'
+import { useProjectsApi } from '~/composables/api/projects'
 
-// APIs
-const { getCalendarEvents } = useCalendarEventsApi()
+const { getCalendarEvents, createCalendarEvent  } = useCalendarEventsApi()
 const route = useRoute()
+const user = getLoggedUser()
+const { getProjects } = useProjectsApi()
+const projects = ref([])
 
-// Date constants
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
 ]
 
-// State
 const currentYear = ref(new Date().getFullYear())
 const currentMonth = ref(new Date().getMonth())
 const selectedDay = ref(null)
 const eventsByDate = ref({})
+const showModal = ref(false)
 
-// Fetch project ID from route
 const projectId = Number(route.params.id)
 
-// Load events
+
 onMounted(async () => {
   const events = await getCalendarEvents(projectId)
   eventsByDate.value = groupEventsByDate(events)
+  const response = await getProjects()
+  projects.value = Array.isArray(response) ? response : response.data
 })
+
+const newEvent = ref({
+  title: '',
+  description: '',
+  start_date: '',
+  end_date: '',
+  project_id: '',
+})
+async function createEventHandler() {
+  try {
+    const eventPayload = {
+      ...newEvent.value,
+      project_id: projectId,
+      created_by: user?.id, 
+    }
+
+    const savedEvent = await createCalendarEvent(eventPayload)
+
+    const dateKey = new Date(savedEvent.start_date).toDateString()
+    eventsByDate.value[dateKey] = eventsByDate.value[dateKey] || []
+    eventsByDate.value[dateKey].push(savedEvent)
+
+    if (selectedDay.value && selectedDay.value.date.toDateString() === dateKey) {
+      selectedDay.value.events.push(savedEvent)
+    }
+
+    // Reset form
+    newEvent.value = {
+      title: '',
+      description: '',
+      start_date: '',
+      end_date: '',
+    }
+    showModal.value = false
+  } catch (error) {
+    console.error('Error creating event:', error)
+    alert('Failed to create event')
+  }
+}
 
 function groupEventsByDate(events) {
   return events.reduce((acc, event) => {
@@ -162,7 +238,7 @@ function getFirstEventTitle(day) {
 
 <style scoped>
 .calendar-app {
-  max-width: 90%;
+  max-width: 84%;
   margin: 5%;
   font-family: 'Arial', sans-serif;
   background-color: #f0f8ff; 
@@ -196,7 +272,7 @@ function getFirstEventTitle(day) {
   color: white; 
   border-radius: 5px;
 }
-
+/*
 .calendar-day,
 .empty-day {
   text-align: center;
@@ -206,7 +282,23 @@ function getFirstEventTitle(day) {
   cursor: pointer;
   transition: background-color 0.3s; 
 }
-
+*/
+.calendar-day,
+.empty-day {
+  width: 100%;
+  aspect-ratio: 1 / 1; 
+  text-align: center;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
 .calendar-day:hover {
   background-color: #b0e0e6;
 }
@@ -255,7 +347,17 @@ function getFirstEventTitle(day) {
   cursor: pointer;
   transition: background-color 0.3s; 
 }
-
+.create-event-button {
+  display: block;
+  margin: 2rem auto 0;
+  padding: 0.5rem 1rem;
+  background: #4682B4; 
+  color: white; 
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s; 
+}
 .close-button:hover {
   background: #5a9bd4; 
 }
@@ -275,6 +377,79 @@ function getFirstEventTitle(day) {
   text-overflow: ellipsis;
   border-radius: 5px;
   background-color: #69caf0; 
+}
+
+.project-selector{
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 3rem;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+}
+
+.modal-content h2 {
+  margin-bottom: 1rem;
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.modal-buttons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-buttons button[type='submit'] {
+  background-color: #4682B4;
+  color: white;
+}
+
+.modal-buttons button[type='button'] {
+  background-color: #ccc;
+  color: #333;
 }
 
 </style>

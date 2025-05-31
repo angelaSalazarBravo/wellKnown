@@ -2,27 +2,27 @@
   <Header title="Projects" />
   <img src="/images/wk1.png" alt="Projects" class="project-img" />
   <div v-if="isAdmin" class="admin-actions">
-    <button class="btn-add" @click="showModal = true">Crear Proyecto</button>
+    <button class="btn-add" @click="showModal = true">Add project</button>
   </div>
 <div v-if="showModal" class="modal-overlay">
   <div class="modal-content">
-    <h2>Crear Proyecto</h2>
+    <h2>Add project</h2>
     <form @submit.prevent="createProjectHandler">
-      <label>Nombre:</label>
+      <label>Name:</label>
       <input v-model="newProject.name" required />
 
-      <label>Descripción:</label>
+      <label>Description:</label>
       <textarea v-model="newProject.description" required></textarea>
 
-      <label>Inicio:</label>
+      <label>Start Date:</label>
       <input type="date" v-model="newProject.start_date" required />
 
-      <label>Fin:</label>
+      <label>End Date:</label>
       <input type="date" v-model="newProject.end_date" required />
 
       <div class="modal-buttons">
-        <button type="submit">Crear</button>
-        <button type="button" @click="showModal = false">Cancelar</button>
+        <button type="submit">Create</button>
+        <button type="button" @click="showModal = false">Cancel</button>
       </div>
     </form>
   </div>

@@ -58,6 +58,33 @@
     
     <button class="slider-btn right" @click="scrollRight('events')">&#10095;</button>
   </div>
+  <p class="little-p">Issues</p>
+
+<div v-if="isLoading" class="spinner-container">
+  <div class="spinner"></div>
+</div>
+
+<div v-else-if="issues.length === 0" class="empty-msg">
+  No hay issues para mostrar.
+</div>
+
+<div v-else class="slider-container">
+  <button class="slider-btn left" @click="scrollLeft('issues')">&#10094;</button>
+  
+  <div class="slider" ref="issuesSlider">
+    <div
+      v-for="issue in issues"
+      :key="issue.id"
+      class="project-card"
+    >
+      <h2 class="project-title">{{ issue.title }}</h2>
+      <p class="project-description">{{ issue.repository.full_name }}</p>
+      <a :href="issue.html_url" target="_blank" class="project-dates">Go GitHub</a>
+    </div>
+  </div>
+
+  <button class="slider-btn right" @click="scrollRight('issues')">&#10095;</button>
+</div>
 
   <p v-if="error" class="error">{{ error }}</p>
 </template>
@@ -66,7 +93,8 @@
 import { ref, onMounted } from 'vue'
 import { useProjectsApi } from '~/composables/api/projects'
 import { useCalendarEventsApi } from '~/composables/api/calendar-events'
-
+import { getIssues } from '~/composables/api/github'
+import { getLoggedUser } from '~/utils/auth'
 const { getProjects } = useProjectsApi()
 const { getCalendarEvents } = useCalendarEventsApi()
 
@@ -75,25 +103,46 @@ const events = ref<any[]>([])
 const userName = ref('')
 const projectsSlider = ref<HTMLElement | null>(null)
 const eventsSlider = ref<HTMLElement | null>(null)
+const issuesSlider = ref<HTMLElement | null>(null)
+
 const isLoading = ref(true)
 const error = ref('')
 
-const scrollAmount = 300 
+const issues = ref<any[]>([])
+const isAdmin = ref(false)
 
-const scrollLeft = (type: 'projects' | 'events') => {
-  if (type === 'projects' && projectsSlider.value) {
-    projectsSlider.value.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
-  } else if (type === 'events' && eventsSlider.value) {
-    eventsSlider.value.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+
+const loadIssues = async () => {
+  try {
+    const user = getLoggedUser()
+    isAdmin.value = user?.role === 'admin'
+    const data = await getIssues(isAdmin.value)
+    issues.value = data
+  } catch (err: any) {
+    console.error('Error cargando issues', err)
+    error.value = 'Error cargando issues'
   }
 }
+const scrollAmount = 300 
 
-const scrollRight = (type: 'projects' | 'events') => {
-  if (type === 'projects' && projectsSlider.value) {
-    projectsSlider.value.scrollBy({ left: scrollAmount, behavior: 'smooth' })
-  } else if (type === 'events' && eventsSlider.value) {
-    eventsSlider.value.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+const scrollLeft = (type: 'projects' | 'events' | 'issues') => {
+  const sliders = {
+    projects: projectsSlider,
+    events: eventsSlider,
+    issues: issuesSlider,
   }
+  const el = sliders[type].value
+  if (el) el.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+}
+
+const scrollRight = (type: 'projects' | 'events' | 'issues') => {
+  const sliders = {
+    projects: projectsSlider,
+    events: eventsSlider,
+    issues: issuesSlider,
+  }
+  const el = sliders[type].value
+  if (el) el.scrollBy({ left: scrollAmount, behavior: 'smooth' })
 }
 
 const formatDate = (dateStr: string) =>
@@ -132,6 +181,7 @@ onMounted(async () => {
     console.error('Error loading events', e)
     error.value = 'Error loading events'
   }
+  await loadIssues()
 
   isLoading.value = false
 })
