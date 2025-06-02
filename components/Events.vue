@@ -463,15 +463,15 @@ async function createMeetingHandler() {
   opacity: 0;
 }
 .event-title {
+  padding: 0.5rem;
   font-size: 0.75rem;
   margin-top: 0.25rem;
   color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   border-radius: 5px;
-  background-color: #69caf0; 
+  background-color: #69caf0;
+  word-wrap: break-word;
 }
+
 
 .project-selector{
   width: 100%;
