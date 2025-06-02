@@ -33,6 +33,14 @@
                  <img src="/icons/events.png" alt="Events Icon" class="icon" />
                   <span>events</span>
                 </li>
+                                <li
+                  class="sidebar-item"
+                  :class="{ active: selected === 'meetings' }"
+                  @click="selected = 'meetings'"
+                >
+                 <img src="/icons/events.png" alt="meetings Icon" class="icon" />
+                  <span>meetings</span>
+                </li>
               </ul>
             </nav>
           </div>
@@ -56,13 +64,14 @@ import { ref, computed } from 'vue'
 import Home from '~/components/Home.vue'
 import Projects from '~/components/Projects.vue'
 import Events from '~/components/Events.vue'
-
+import Meetings from '~/components/Meetings.vue'
 const selected = ref('home') 
 
 const currentComponent = computed(() => {
   if (selected.value === 'home') return Home
   if (selected.value === 'projects') return Projects
   if (selected.value === 'events') return Events
+  if (selected.value === 'meetings') return Meetings
   return null
 })
 </script>
