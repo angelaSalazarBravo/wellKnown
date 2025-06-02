@@ -40,7 +40,7 @@
             </div>
 
             <div v-else class="error">Proyecto no encontrado</div>
-
+        <div class="dual-columns">
               <div v-if="events.length > 0" class="events-section">
                 <Header title="Project Events" />
                 <div v-for="event in events" :key="event.id" class="event-card">
@@ -52,9 +52,18 @@
                   <p>{{ event.description }}</p>
                 </div>
               </div>
-
-
-            
+             <div v-if="meetings.length > 0" class="meetings-section">
+              <Header title="Project Meetings" />
+              <div v-for="meeting in meetings" :key="meeting.id" class="meeting-card">
+                <strong>{{ meeting.title }}</strong><br />
+                <small>
+                  <strong>Start Date: </strong>{{ formatDate(meeting.start_date) }} <br />
+                  <strong>End Date:</strong> {{ formatDate(meeting.end_date) }}
+                </small>
+                <p>{{ meeting.description }}</p>
+              </div>
+            </div>
+          </div>
           </div>
         </main>
       </div>
@@ -67,10 +76,12 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useProjectsApi } from '~/composables/api/projects'
 import { useCalendarEventsApi } from '~/composables/api/calendar-events'
+import {useMeetingsApi} from '~/composables/api/meetings'
 
 const route = useRoute()
 const router = useRouter()
 
+const { getMeetings } = useMeetingsApi()
 const { getProjectById } = useProjectsApi()
 const { getCalendarEvents } = useCalendarEventsApi()
 
@@ -78,6 +89,7 @@ const project = ref<any>(null)
 const isLoading = ref(false)
 const error = ref('')
 const events = ref([])
+const meetings = ref([])
 
 const formatDate = (dateStr: string) =>
   new Date(dateStr).toLocaleDateString('es-ES', {
@@ -98,6 +110,7 @@ onMounted(async () => {
     const data = await getProjectById(id)
     project.value = data
     events.value = await getCalendarEvents(id)
+    meetings.value = await getMeetings(id)
   } catch (err: any) {
     console.error(err)
     if (err?.status === 401) {
@@ -240,12 +253,7 @@ onMounted(async () => {
     color: #20217c;
     line-height: 1.5;
   }
-.events-section {
-  margin-top: 2rem;
-  gap: 1.5rem;
-  max-width: 45%;
-  padding-right: 2.5rem;
-}
+
 .event-card:hover {
   transform: scale(1.02);
 }
@@ -293,7 +301,7 @@ onMounted(async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px; /* o el alto que desees mientras carga */
+  height: 200px;
 }
 
 .spinner {
@@ -313,4 +321,46 @@ onMounted(async () => {
     transform: rotate(360deg);
   }
 }
+.dual-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.events-section,
+.meetings-section {
+  flex: 1;
+  min-width: 300px;
+  max-width: 45%;
+}
+
+.meeting-card {
+  background: linear-gradient(to bottom, #d8b4fe, #a78bfa);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 1rem;
+  margin-top:1.5rem;
+}
+
+.meeting-card strong {
+  font-size: 1.2rem;
+  color: #fff;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.meeting-card small {
+  font-size: 0.9rem;
+  color: #f0f0f0;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.meeting-card p {
+  font-size: 1.1rem;
+  color: #fff;
+  line-height: 1.5;
+}
+
 </style>
