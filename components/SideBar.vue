@@ -41,6 +41,15 @@
                  <img src="/icons/events.png" alt="meetings Icon" class="icon" />
                   <span>meetings</span>
                 </li>
+                <li
+                  class="sidebar-item"
+                  :class="{ active: selected === 'personalArea' }"
+                  @click="selected = 'personalArea'"
+                >
+                 <img src="/icons/events.png" alt="meetings Icon" class="icon" />
+                  <span>Personal Area</span>
+                </li>
+                
               </ul>
             </nav>
           </div>
@@ -65,6 +74,7 @@ import Home from '~/components/Home.vue'
 import Projects from '~/components/Projects.vue'
 import Events from '~/components/Events.vue'
 import Meetings from '~/components/Meetings.vue'
+import PersonalArea from '~/components/PersonalArea.vue'
 const selected = ref('home') 
 
 const currentComponent = computed(() => {
@@ -72,6 +82,7 @@ const currentComponent = computed(() => {
   if (selected.value === 'projects') return Projects
   if (selected.value === 'events') return Events
   if (selected.value === 'meetings') return Meetings
+  if (selected.value === 'personalArea') return PersonalArea
   return null
 })
 </script>
