@@ -63,6 +63,18 @@
                 <p>{{ meeting.description }}</p>
               </div>
             </div>
+            <div v-if="issues.length > 0" class="issues-section">
+              <Header title="Assigned Issues" />
+            <ul>
+              <li v-for="issue in issues" :key="issue.id" class="issue-card">
+                <a :href="issue.html_url" target="_blank" rel="noopener noreferrer">{{ issue.title }}</a>
+                <p>#{{ issue.number }} - State: {{ issue.state }}</p>
+              </li>
+            </ul>
+            </div>
+
+
+
           </div>
           </div>
         </main>
@@ -76,7 +88,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useProjectsApi } from '~/composables/api/projects'
 import { useCalendarEventsApi } from '~/composables/api/calendar-events'
-import {useMeetingsApi} from '~/composables/api/meetings'
+import { useMeetingsApi } from '~/composables/api/meetings'
+import { getAssignedIssues } from '~/composables/api/github'  
 
 const route = useRoute()
 const router = useRouter()
@@ -90,6 +103,7 @@ const isLoading = ref(false)
 const error = ref('')
 const events = ref([])
 const meetings = ref([])
+const issues = ref<any[]>([])
 
 const formatDate = (dateStr: string) =>
   new Date(dateStr).toLocaleDateString('es-ES', {
@@ -109,8 +123,22 @@ onMounted(async () => {
   try {
     const data = await getProjectById(id)
     project.value = data
+    console.log('project.githubRepoFullName:', project.value.name)
+
     events.value = await getCalendarEvents(id)
     meetings.value = await getMeetings(id)
+
+    if (project.value.name) {
+      const allIssues = await getAssignedIssues()
+      console.log('All assigned issues:', allIssues)
+      issues.value = allIssues.filter(
+        (issue: any) => issue.repository.full_name.endsWith(`/${project.value.name}`)
+      )
+      console.log('Filtered issues:', issues.value)
+    } else {
+      issues.value = []
+    }
+
   } catch (err: any) {
     console.error(err)
     if (err?.status === 401) {
@@ -122,7 +150,9 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
+
 </script>
+
 
 <style scoped>
 

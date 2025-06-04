@@ -45,8 +45,8 @@
       <h2 class="project-title">{{ project.name }}</h2>
       <p class="project-description">{{ project.description }}</p>
       <p class="project-dates">
-        <strong>Inicio:</strong> {{ formatDate(project.start_date) }} <br />
-        <strong>Fin:</strong> {{ formatDate(project.end_date) }}
+        <strong>Start Date:</strong> {{ formatDate(project.start_date) }} <br />
+        <strong>End Date:</strong> {{ formatDate(project.end_date) }}
       </p>
     </router-link>
   </div>
@@ -59,6 +59,7 @@ import Header from '~/components/Header.vue'
 import { useProjectsApi } from '~/composables/api/projects'
 import { getLoggedUser } from '~/utils/auth'
 const { getProjects, createProject } = useProjectsApi()
+import { createGitHubRepo } from '~/composables/api/github'
 
 const user = getLoggedUser()
 const isAdmin = user?.role === 'admin'
@@ -73,7 +74,7 @@ const newProject = ref({
   start_date: '',
   end_date: ''
 })
-
+/*
 const createProjectHandler = async () => {
   try {
     const payload = {
@@ -84,6 +85,30 @@ const createProjectHandler = async () => {
     showModal.value = false
     const response = await getProjects()
     projects.value = Array.isArray(response) ? response : response.data
+  } catch (err) {
+    console.error('Error al crear proyecto:', err)
+  }
+}*/
+const createProjectHandler = async () => {
+  try {
+    const { name, description } = newProject.value
+
+    const githubRepo = await createGitHubRepo({
+      name,
+      description
+    })
+    console.log('Repositorio creado:', githubRepo.html_url)
+
+    const payload = {
+      ...newProject.value,
+      created_by: user.id
+    }
+    await createProject(payload)
+
+    showModal.value = false
+    const response = await getProjects()
+    projects.value = Array.isArray(response) ? response : response.data
+
   } catch (err) {
     console.error('Error al crear proyecto:', err)
   }
@@ -106,7 +131,6 @@ onMounted(async () => {
   } catch (err: any) {
     console.error(err)
     if (err?.status === 401) {
-      // token inválido → volver al login
       router.push('/login')
     } else {
       error.value = 'No se pudieron cargar los proyectos'
