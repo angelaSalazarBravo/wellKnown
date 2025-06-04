@@ -38,7 +38,7 @@
                   :class="{ active: selected === 'meetings' }"
                   @click="selected = 'meetings'"
                 >
-                 <img src="/icons/events.png" alt="meetings Icon" class="icon" />
+                 <img src="/icons/meeting.png" alt="meetings Icon" class="icon" />
                   <span>meetings</span>
                 </li>
                 <li
@@ -46,7 +46,7 @@
                   :class="{ active: selected === 'personalArea' }"
                   @click="selected = 'personalArea'"
                 >
-                 <img src="/icons/events.png" alt="meetings Icon" class="icon" />
+                 <img src="/icons/user.png" alt="personal Icon" class="icon" />
                   <span>Personal Area</span>
                 </li>
                 

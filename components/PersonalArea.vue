@@ -12,9 +12,9 @@
     </div>
 
     <div v-if="user?.role === 'admin'" class="mt-8">
-      <h2 class="text-xl font-bold mb-2">Users</h2>
+      <Header title="Users" />
 
-      <button @click="openCreateUserModal" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">
+      <button @click="openCreateUserModal" class="btn-add">
         Add User
       </button>
 
@@ -24,6 +24,7 @@
             <th class="px-4 py-2">ID</th>
             <th class="px-4 py-2">Name</th>
             <th class="px-4 py-2">Email</th>
+            <th class="px-4 py-2">Role</th>
             <th class="px-4 py-2">Actions</th>
           </tr>
         </thead>
@@ -32,43 +33,62 @@
             <td class="px-4 py-2">{{ u.id }}</td>
             <td class="px-4 py-2">{{ u.name }}</td>
             <td class="px-4 py-2">{{ u.email }}</td>
+            <td class="px-4 py-2">{{ u.role }}</td>
             <td class="px-4 py-2">
-              <button @click="deleteUserById(u.id)" class="bg-red-500 text-white px-2 py-1 rounded">
-                Delete
-              </button>
+              <button class="btn-add" @click="deleteUserById(u.id)">Delete</button>
+              <button class="btn-add" @click="editUserById(u.id)">Edit</button>
             </td>
           </tr>
         </tbody>
       </table>
+
+    <div v-if="isLoading" class="spinner-container">
+      <div class="spinner"></div>
+    </div>
     </div>
 
-    <!-- Create User Modal -->
-    <div v-if="showModal" class="modal-overlay">
-      <div class="modal-content">
-        <h3 class="text-lg font-bold mb-2">Create New User</h3>
-        <form @submit.prevent="handleCreateUser">
-          <label class="block mt-2">Name:</label>
-          <input v-model="newUser.name" required class="input" />
+<div v-if="showModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3 class="text-lg font-bold mb-4">
+      {{ isEditMode ? 'Edit User' : 'Create New User' }}
+    </h3>
+    <form @submit.prevent="isEditMode ? handleUpdateUser() : handleCreateUser()">
+      <label class="block mt-2">Name:</label>
+      <input v-model="newUser.name" required class="input" />
 
-          <label class="block mt-2">Email:</label>
-          <input type="email" v-model="newUser.email" required class="input" />
+      <label class="block mt-2">Email:</label>
+      <input type="email" v-model="newUser.email" required class="input" />
 
-          <label class="block mt-2">Password:</label>
-          <input type="password" v-model="newUser.password" required class="input" />
+      <label class="block mt-2">Password:</label>
+      <input
+        type="password"
+        v-model="newUser.password"
+        :required="!isEditMode"
+        class="input"
+      />
 
-          <label class="block mt-2">Role:</label>
-          <select v-model="newUser.role" class="input" required>
-            <option value="admin">Admin</option>
-            <option value="worker">Worker</option>
-          </select>
+      <label class="block mt-2">Role:</label>
+      <select v-model="newUser.role" class="input" required>
+        <option value="admin">Admin</option>
+        <option value="worker">Worker</option>
+      </select>
 
-          <div class="flex justify-end gap-2 mt-4">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Create</button>
-            <button type="button" @click="showModal = false" class="bg-gray-300 px-4 py-2 rounded">Cancel</button>
-          </div>
-        </form>
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="submit" class="btn-add">
+          {{ isEditMode ? 'Update' : 'Create' }}
+        </button>
+        <button
+          type="button"
+          @click="showModal = false"
+          class="btn-add"
+        >
+          Cancel
+        </button>
       </div>
-    </div>
+    </form>
+  </div>
+</div>
+
   </div>
 </template>
 
@@ -78,12 +98,15 @@ import Header from '~/components/Header.vue'
 import { useUsersApi } from '~/composables/api/users'
 import { useRouter } from 'vue-router'
 
-const { getUsers, deleteUser, createUser } = useUsersApi()
+const { getUsers, deleteUser, createUser, updateUser } = useUsersApi()
 const router = useRouter()
 
 const user = ref(null)
 const users = ref([])
+const isLoading = ref(false)
 const showModal = ref(false)
+const isEditMode = ref(false)
+const editingUserId = ref(null)
 
 const newUser = ref({
   name: '',
@@ -93,16 +116,26 @@ const newUser = ref({
 })
 
 onMounted(async () => {
-  const userData = localStorage.getItem('user')
-  if (!userData) {
-    router.push('/login')
-    return
-  }
+  isLoading.value = true
+  try {
+    const userData = localStorage.getItem('user')
+    if (!userData) {
+      router.push('/login')
+      return
+    }
 
-  user.value = JSON.parse(userData)
+    user.value = JSON.parse(userData)
 
-  if (user.value?.role === 'admin') {
-    await fetchUsers()
+    if (user.value?.role === 'admin') {
+      await fetchUsers()
+    }
+  } catch (err) {
+    console.error('Error loading user or users:', err)
+    if (err?.status === 401) {
+      router.push('/login')
+    }
+  } finally {
+    isLoading.value = false
   }
 })
 
@@ -132,6 +165,23 @@ const openCreateUserModal = () => {
     password: '',
     role: 'worker'
   }
+  isEditMode.value = false
+  showModal.value = true
+}
+
+const editUserById = (id) => {
+  const selected = users.value.find(u => u.id === id)
+  if (!selected) return
+
+  newUser.value = {
+    name: selected.name,
+    email: selected.email,
+    password: '',
+    role: selected.role
+  }
+
+  editingUserId.value = id
+  isEditMode.value = true
   showModal.value = true
 }
 
@@ -145,15 +195,47 @@ const handleCreateUser = async () => {
     console.error(error.value)
   }
 }
+
+const handleUpdateUser = async () => {
+  const payload = { ...newUser.value }
+  if (!payload.password) delete payload.password
+
+  const { error } = await updateUser(editingUserId.value, payload)
+  if (!error.value) {
+    showModal.value = false
+    editingUserId.value = null
+    await fetchUsers()
+  } else {
+    alert('Error updating user')
+    console.error(error.value)
+  }
+}
 </script>
+
 
 <style scoped>
 table {
   border-collapse: collapse;
+  width: 90%;
 }
+
 th, td {
   border: 1px solid #ccc;
+  padding: 0.75rem;
+  text-align: left;
 }
+
+th {
+  background-color: #4682B4;
+  color: white; 
+}
+
+
+
+tr:hover {
+  background-color:rgb(164, 204, 236);
+}
+
 .input {
   width: 100%;
   padding: 0.5rem;
@@ -161,6 +243,7 @@ th, td {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -173,11 +256,49 @@ th, td {
   align-items: center;
   z-index: 50;
 }
+
 .modal-content {
   background: #fff;
   padding: 2rem;
   border-radius: 8px;
   width: 400px;
   max-width: 90%;
+}
+.btn-add {
+  background-color: #4682B4;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  margin-bottom:2% ;
+  margin-top: 2%;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px; /* o el alto que desees mientras carga */
+}
+
+.spinner {
+  border: 4px solid #cce6ff;
+  border-top: 4px solid #4682B4;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
