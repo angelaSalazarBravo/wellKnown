@@ -3,6 +3,7 @@
   <img src="/images/wk1.png" alt="Projects" class="project-img" />
   <div v-if="isAdmin" class="admin-actions">
     <button class="btn-add" @click="showModal = true">Add project</button>
+    <button class="btn-add" @click="showAssignModal = true">Assign user to project</button>
   </div>
 <div v-if="showModal" class="modal-overlay">
   <div class="modal-content">
@@ -23,6 +24,34 @@
       <div class="modal-buttons">
         <button type="submit">Create</button>
         <button type="button" @click="showModal = false">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div v-if="showAssignModal" class="modal-overlay">
+  <div class="modal-content">
+    <h2>Assign User to Project</h2>
+
+    <form @submit.prevent="assignUserHandler">
+      <label>Select User:</label>
+      <select v-model="selectedUserId" required>
+        <option disabled value="">-- Choose a user --</option>
+        <option v-for="oneuser in users" :key="oneuser.id" :value="oneuser.id">
+          {{ oneuser.name }}
+        </option>
+      </select>
+
+      <label>Select Project:</label>
+      <select v-model="selectedProjectId" required>
+        <option disabled value="">-- Choose a project --</option>
+        <option v-for="project in projects" :key="project.id" :value="project.id">
+          {{ project.name }}
+        </option>
+      </select>
+
+      <div class="modal-buttons">
+        <button type="submit">OK</button>
+        <button type="button" @click="showAssignModal = false">Cancel</button>
       </div>
     </form>
   </div>
@@ -51,52 +80,47 @@
     </router-link>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '~/components/Header.vue'
 import { useProjectsApi } from '~/composables/api/projects'
+import { useUsersApi } from '~/composables/api/users'
 import { getLoggedUser } from '~/utils/auth'
-const { getProjects, createProject } = useProjectsApi()
 import { createGitHubRepo } from '~/composables/api/github'
+
+const { getProjects, createProject, assignUserToProject, getMyProjects } = useProjectsApi()
+const { getUsers } = useUsersApi()
+
 
 const user = getLoggedUser()
 const isAdmin = user?.role === 'admin'
 const projects = ref([] as any[])
+const users = ref([] as any[])
+
 const isLoading = ref(false)
 const error = ref('')
-
 const showModal = ref(false)
+const showAssignModal = ref(false)
+
+
 const newProject = ref({
   name: '',
   description: '',
   start_date: '',
   end_date: ''
 })
-/*
-const createProjectHandler = async () => {
-  try {
-    const payload = {
-      ...newProject.value,
-      created_by: user.id
-    }
-    await createProject(payload)
-    showModal.value = false
-    const response = await getProjects()
-    projects.value = Array.isArray(response) ? response : response.data
-  } catch (err) {
-    console.error('Error al crear proyecto:', err)
-  }
-}*/
+
+
+const selectedUserId = ref<number | null>(null)
+const selectedProjectId = ref<number | null>(null)
+
+
 const createProjectHandler = async () => {
   try {
     const { name, description } = newProject.value
 
-    const githubRepo = await createGitHubRepo({
-      name,
-      description
-    })
+    const githubRepo = await createGitHubRepo({ name, description })
     console.log('Repositorio creado:', githubRepo.html_url)
 
     const payload = {
@@ -108,11 +132,26 @@ const createProjectHandler = async () => {
     showModal.value = false
     const response = await getProjects()
     projects.value = Array.isArray(response) ? response : response.data
-
   } catch (err) {
     console.error('Error al crear proyecto:', err)
   }
 }
+
+const assignUserHandler = async () => {
+  try {
+    if (!selectedUserId.value || !selectedProjectId.value) return
+
+  await assignUserToProject(selectedUserId.value, selectedProjectId.value)
+
+
+
+    showAssignModal.value = false
+    alert('Usuario asignado con éxito.')
+  } catch (err) {
+    console.error('Error al asignar usuario a proyecto:', err)
+  }
+}
+
 const router = useRouter()
 
 const formatDate = (dateStr: string) =>
@@ -122,24 +161,35 @@ const formatDate = (dateStr: string) =>
     day: '2-digit',
   })
 
-
 onMounted(async () => {
   isLoading.value = true
   try {
-    const response = await getProjects()
-    projects.value = Array.isArray(response) ? response : response.data
+    const [projectResponse, userResponse] = await Promise.all([
+      isAdmin ? getProjects() : getMyProjects(),
+      isAdmin ? getUsers() : Promise.resolve([]) 
+    ])
+
+    projects.value = Array.isArray(projectResponse) ? projectResponse : (projectResponse.data ?? [])
+
+    if (userResponse && 'data' in userResponse) {
+      users.value = userResponse.data.value ?? []
+    } else {
+      users.value = Array.isArray(userResponse) ? userResponse : []
+    }
   } catch (err: any) {
     console.error(err)
     if (err?.status === 401) {
       router.push('/login')
     } else {
-      error.value = 'No se pudieron cargar los proyectos'
+      error.value = 'No se pudieron cargar los datos'
     }
   } finally {
     isLoading.value = false
   }
 })
+
 </script>
+
 
 <style scoped>
 .projects-grid {

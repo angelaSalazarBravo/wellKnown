@@ -36,10 +36,37 @@ export const useProjectsApi = () => {
       },
     })
   }
+  const assignUserToProject = async (userId: number, projectId: number) => {
+  const token = localStorage.getItem('authToken')
+    if (!token) throw new Error('No token found')
+
+    return await $fetch('http://localhost:8000/api/user-projects', {
+      method: 'POST',
+      body: { userId: userId, projectId: projectId },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
+    })
+  }
+const getMyProjects = async () => {
+  const token = localStorage.getItem('authToken')
+  if (!token) throw new Error('No token found')
+
+  return await $fetch('http://localhost:8000/api/my-projects', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+    },
+  })
+}
 
   return {
     getProjects,
     getProjectById,
-    createProject
+    createProject,
+    assignUserToProject,
+    getMyProjects
   }
 }

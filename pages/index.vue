@@ -20,6 +20,7 @@ onMounted(() => {
   const token = localStorage.getItem('token')
   if (!token) {
     router.push('/login')
+    console.log('esto ocurre')
   }
 })
 </script>

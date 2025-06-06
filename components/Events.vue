@@ -49,8 +49,8 @@
           <li v-if="selectedDay.events.length === 0">No events</li>
         </ul>
         <div class="button-group">
-          <button @click="openEventModal" class="create-event-button">Add Event</button>
-          <button @click="openMeetingModal" class="add-meeting-button">Add Meeting</button>
+          <button v-if="isAdmin" @click="openEventModal" class="create-event-button">Add Event</button>
+          <button v-if="isAdmin" @click="openMeetingModal" class="add-meeting-button">Add Meeting</button>
           <button @click="selectedDay = null" class="close-button">Close</button>
         </div>
       </div>
@@ -129,6 +129,7 @@ const meetingsByDate = ref({})
 const { getCalendarEvents, createCalendarEvent } = useCalendarEventsApi()
 const route = useRoute()
 const user = getLoggedUser()
+const isAdmin = user?.role === 'admin'
 const { getProjects } = useProjectsApi()
 const projects = ref([])
 

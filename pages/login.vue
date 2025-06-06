@@ -7,8 +7,14 @@
       <button type="submit">Iniciar sesión</button>
     </form>
     <p v-if="error" class="error-message">{{ error }}</p>
+
+    <p class="text-center mt-2">
+      Don't have an account?
+      <router-link to="/register">Register here</router-link>
+    </p>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUsersApi } from '~/composables/api/users'
