@@ -333,8 +333,9 @@ async function createMeetingHandler() {
 
 <style scoped>
 .calendar-app {
-  max-width: 84%;
-  margin: 5%;
+  max-width: 60%;
+  margin-left:18%;
+  margin-top: 2%;
   font-family: 'Arial', sans-serif;
   background-color: #f0f8ff; 
   border-radius: 10px;

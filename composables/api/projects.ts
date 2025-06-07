@@ -61,12 +61,27 @@ const getMyProjects = async () => {
     },
   })
 }
+const updateProject = async (id: number, updatedData: Record<string, any>) => {
+  const token = localStorage.getItem('authToken')
+  if (!token) throw new Error('No token found')
+
+  return await $fetch(`http://localhost:8000/api/projects/${id}`, {
+    method: 'PUT',
+    body: updatedData,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+    },
+  })
+}
+
 
   return {
     getProjects,
     getProjectById,
     createProject,
     assignUserToProject,
-    getMyProjects
+    getMyProjects,
+    updateProject
   }
 }

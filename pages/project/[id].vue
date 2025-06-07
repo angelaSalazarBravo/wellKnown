@@ -23,9 +23,9 @@
       <div class="main">
         <main class="main-content">
           <div class="main-inner">
-          <div v-if="isLoading" class="spinner-container">
-          <div class="spinner"></div>
-          </div>
+            <div v-if="isLoading" class="spinner-container">
+              <div class="spinner"></div>
+            </div>
 
             <div v-else-if="error" class="error">{{ error }}</div>
 
@@ -36,11 +36,36 @@
                 <strong>Inicio:</strong> {{ formatDate(project.start_date) }}
                 <strong>Fin:</strong> {{ formatDate(project.end_date) }}
               </p>
-              
+              <button @click="editMode = true" class="edit-btn">Edit Project</button>
+            </div>
+
+            <div v-if="editMode" class="modal-overlay">
+              <div class="modal-content">
+                <h2>Edit Project</h2>
+                <form @submit.prevent="submitEdit">
+                  <label>Name:</label>
+                  <input v-model="editForm.name" required />
+
+                  <label>Description:</label>
+                  <textarea v-model="editForm.description"></textarea>
+
+                  <label>Start date:</label>
+                  <input type="date" v-model="editForm.start_date" />
+
+                  <label>End date:</label>
+                  <input type="date" v-model="editForm.end_date" />
+
+                  <div class="modal-buttons">
+                    <button type="submit">save</button>
+                    <button type="button" @click="editMode = false">Cancel</button>
+                  </div>
+                </form>
+              </div>
             </div>
 
             <div v-else class="error">Proyecto no encontrado</div>
-        <div class="dual-columns">
+
+            <div class="dual-columns">
               <div v-if="events.length > 0" class="events-section">
                 <Header title="Project Events" />
                 <div v-for="event in events" :key="event.id" class="event-card">
@@ -52,30 +77,29 @@
                   <p>{{ event.description }}</p>
                 </div>
               </div>
-             <div v-if="meetings.length > 0" class="meetings-section">
-              <Header title="Project Meetings" />
-              <div v-for="meeting in meetings" :key="meeting.id" class="meeting-card">
-                <strong>{{ meeting.title }}</strong><br />
-                <small>
-                  <strong>Start Date: </strong>{{ formatDate(meeting.start_date) }} <br />
-                  <strong>End Date:</strong> {{ formatDate(meeting.end_date) }}
-                </small>
-                <p>{{ meeting.description }}</p>
+
+              <div v-if="meetings.length > 0" class="meetings-section">
+                <Header title="Project Meetings" />
+                <div v-for="meeting in meetings" :key="meeting.id" class="meeting-card">
+                  <strong>{{ meeting.title }}</strong><br />
+                  <small>
+                    <strong>Start Date: </strong>{{ formatDate(meeting.start_date) }} <br />
+                    <strong>End Date:</strong> {{ formatDate(meeting.end_date) }}
+                  </small>
+                  <p>{{ meeting.description }}</p>
+                </div>
+              </div>
+
+              <div v-if="issues.length > 0" class="issues-section">
+                <Header title="Assigned Issues" />
+                <ul>
+                  <li v-for="issue in issues" :key="issue.id" class="issue-card">
+                    <a :href="issue.html_url" target="_blank" rel="noopener noreferrer">{{ issue.title }}</a>
+                    <p>#{{ issue.number }} - State: {{ issue.state }}</p>
+                  </li>
+                </ul>
               </div>
             </div>
-            <div v-if="issues.length > 0" class="issues-section">
-              <Header title="Assigned Issues" />
-            <ul>
-              <li v-for="issue in issues" :key="issue.id" class="issue-card">
-                <a :href="issue.html_url" target="_blank" rel="noopener noreferrer">{{ issue.title }}</a>
-                <p>#{{ issue.number }} - State: {{ issue.state }}</p>
-              </li>
-            </ul>
-            </div>
-
-
-
-          </div>
           </div>
         </main>
       </div>
@@ -95,7 +119,7 @@ const route = useRoute()
 const router = useRouter()
 
 const { getMeetings } = useMeetingsApi()
-const { getProjectById } = useProjectsApi()
+const { getProjectById ,updateProject} = useProjectsApi()
 const { getCalendarEvents } = useCalendarEventsApi()
 
 const project = ref<any>(null)
@@ -112,6 +136,26 @@ const formatDate = (dateStr: string) =>
     day: '2-digit',
   })
 
+const editMode = ref(false)
+const editForm = ref({
+  name: '',
+  description: '',
+  start_date: '',
+  end_date: ''
+})
+
+const submitEdit = async () => {
+  try {
+    await updateProject(project.value.id, editForm.value)
+    const updated = await getProjectById(project.value.id)
+    project.value = updated
+    editMode.value = false
+  } catch (err) {
+    console.error('Error actualizando proyecto', err)
+    error.value = 'Error actualizando el proyecto'
+  }
+}
+
 onMounted(async () => {
   const id = Number(route.params.id)
   if (!id) {
@@ -123,18 +167,22 @@ onMounted(async () => {
   try {
     const data = await getProjectById(id)
     project.value = data
-    console.log('project.githubRepoFullName:', project.value.name)
+
+    editForm.value = {
+      name: data.name,
+      description: data.description,
+      start_date: data.start_date,
+      end_date: data.end_date
+    }
 
     events.value = await getCalendarEvents(id)
     meetings.value = await getMeetings(id)
 
     if (project.value.name) {
       const allIssues = await getAssignedIssues()
-      console.log('All assigned issues:', allIssues)
       issues.value = allIssues.filter(
         (issue: any) => issue.repository.full_name.endsWith(`/${project.value.name}`)
       )
-      console.log('Filtered issues:', issues.value)
     } else {
       issues.value = []
     }
@@ -150,18 +198,16 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
-
 </script>
 
-
 <style scoped>
-
 @font-face {
   font-family: 'title';
   src: url('/fonts/Title.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
+
 .layout {
   font-family: sans-serif;
 }
@@ -229,8 +275,6 @@ onMounted(async () => {
   background-color: #d1e8e2;
 }
 
-
-
 .icon {
   width: 20px;
   height: 20px;
@@ -245,9 +289,11 @@ onMounted(async () => {
   min-width: 0;
   overflow: hidden;
 }
+
 .main-content::-webkit-scrollbar {
   display: none;
 }
+
 .main-content {
   position: relative;
   z-index: 0;
@@ -255,6 +301,7 @@ onMounted(async () => {
   overflow-y: auto;
   outline: none;
 }
+
 .link {
   text-decoration: none;
   color: inherit;
@@ -268,21 +315,21 @@ onMounted(async () => {
   padding-left: 2.5rem;
 }
 
- .project-detail {
-    border-radius: 8px;
-  }
+.project-detail {
+  border-radius: 8px;
+}
 
- .project-detail h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #20217c;
-  }
+.project-detail h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #20217c;
+}
 
-  .project-detail p {
-    font-size: 1.1rem;
-    color: #20217c;
-    line-height: 1.5;
-  }
+.project-detail p {
+  font-size: 1.1rem;
+  color: #20217c;
+  line-height: 1.5;
+}
 
 .event-card:hover {
   transform: scale(1.02);
@@ -299,24 +346,27 @@ onMounted(async () => {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   padding: 1rem;
-  margin-top:1.5rem;
+  margin-top: 1.5rem;
 }
 
-.event-card strong {
+.event-card strong,
+.meeting-card strong {
   font-size: 1.2rem;
   color: #fff;
   display: block;
   margin-bottom: 0.5rem;
 }
 
-.event-card small {
+.event-card small,
+.meeting-card small {
   font-size: 0.9rem;
   color: #e0e0e0;
   display: block;
   margin-bottom: 0.5rem;
 }
 
-.event-card p {
+.event-card p,
+.meeting-card p {
   font-size: 1.1rem;
   color: #fff;
   line-height: 1.5;
@@ -327,6 +377,7 @@ onMounted(async () => {
   color: crimson;
   margin-top: 2rem;
 }
+
 .spinner-container {
   display: flex;
   justify-content: center;
@@ -344,13 +395,10 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
+
 .dual-columns {
   display: flex;
   flex-wrap: wrap;
@@ -370,27 +418,72 @@ onMounted(async () => {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   padding: 1rem;
-  margin-top:1.5rem;
+  margin-top: 1.5rem;
 }
 
-.meeting-card strong {
-  font-size: 1.2rem;
-  color: #fff;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+}
+
+.modal-content h2 {
+  margin-bottom: 1rem;
+}
+
+.modal-content label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+  font-weight: bold;
 }
 
-.meeting-card small {
-  font-size: 0.9rem;
-  color: #f0f0f0;
-  display: block;
-  margin-bottom: 0.5rem;
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.meeting-card p {
-  font-size: 1.1rem;
-  color: #fff;
-  line-height: 1.5;
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.modal-buttons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-buttons button[type='submit'] {
+  background-color: #4682B4;
+  color: white;
+}
+
+.modal-buttons button[type='button'] {
+  background-color: #ccc;
+  color: #333;
 }
 
 </style>

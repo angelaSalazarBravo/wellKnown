@@ -66,7 +66,7 @@
   <div v-else class="projects-grid">
      
     <router-link
-      v-for="project in projects"
+      v-for="project in visibleProjects"
       :key="project.id"
       :to="`/project/${project.id}`"
       class="project-card"
@@ -81,7 +81,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,computed  } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '~/components/Header.vue'
 import { useProjectsApi } from '~/composables/api/projects'
@@ -115,7 +115,11 @@ const newProject = ref({
 const selectedUserId = ref<number | null>(null)
 const selectedProjectId = ref<number | null>(null)
 
-
+const visibleProjects = computed(() =>
+  projects.value.filter(
+    (p) => p.description?.toLowerCase() !== 'closed'
+  )
+)
 const createProjectHandler = async () => {
   try {
     const { name, description } = newProject.value
