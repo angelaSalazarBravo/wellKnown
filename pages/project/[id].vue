@@ -63,7 +63,7 @@
               </div>
             </div>
 
-            <div v-else class="error">Proyecto no encontrado</div>
+            
 
             <div class="dual-columns">
               <div v-if="events.length > 0" class="events-section">
@@ -83,13 +83,14 @@
                 <div v-for="meeting in meetings" :key="meeting.id" class="meeting-card">
                   <strong>{{ meeting.title }}</strong><br />
                   <small>
-                    <strong>Start Date: </strong>{{ formatDate(meeting.start_date) }} <br />
-                    <strong>End Date:</strong> {{ formatDate(meeting.end_date) }}
+                    <strong>Date: </strong>{{ formatDate(meeting.date) }} <br />
                   </small>
                   <p>{{ meeting.description }}</p>
                 </div>
               </div>
 
+
+            </div>
               <div v-if="issues.length > 0" class="issues-section">
                 <Header title="Assigned Issues" />
                 <ul>
@@ -99,7 +100,8 @@
                   </li>
                 </ul>
               </div>
-            </div>
+              <Messages v-if="project" :project-id="project.id" :user-id="userId" />
+
           </div>
         </main>
       </div>
@@ -114,6 +116,7 @@ import { useProjectsApi } from '~/composables/api/projects'
 import { useCalendarEventsApi } from '~/composables/api/calendar-events'
 import { useMeetingsApi } from '~/composables/api/meetings'
 import { getAssignedIssues } from '~/composables/api/github'  
+import Messages from '~/components/Messages.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -121,6 +124,8 @@ const router = useRouter()
 const { getMeetings } = useMeetingsApi()
 const { getProjectById ,updateProject} = useProjectsApi()
 const { getCalendarEvents } = useCalendarEventsApi()
+const user = JSON.parse(localStorage.getItem('user') || '{}')
+const userId = user.id
 
 const project = ref<any>(null)
 const isLoading = ref(false)
@@ -486,4 +491,34 @@ onMounted(async () => {
   color: #333;
 }
 
+.issue-card{
+  background: linear-gradient(to bottom, #87CEEB, #4682B4);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  text-decoration: none;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+  width: 80%;
+}
+.edit-btn{
+  background-color: #4682B4;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  margin: 1rem 2.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+.issues-section ul {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
 </style>

@@ -59,7 +59,7 @@
 
   <div v-if="showEventModal" class="modal-overlay">
     <div class="modal-content">
-      <h2>Create Event</h2>
+      <h2>Add Event</h2>
       <form @submit.prevent="createEventHandler">
         <label>Title:</label>
         <input v-model="newEvent.title" required />
@@ -300,9 +300,14 @@ function openMeetingModal() {
 
 async function createEventHandler() {
   try {
-    await createCalendarEvent(newEvent.value)
+    const payload = {
+      ...newEvent.value,
+      created_by: user.id  
+    }
+
+    await createCalendarEvent(payload)
     showEventModal.value = false
-    // Recargar eventos para actualizar calendario
+
     const events = await getCalendarEvents(projectId)
     eventsByDate.value = groupEventsByDate(events)
     if (selectedDay.value) selectDay(selectedDay.value.date.getDate())
@@ -310,6 +315,7 @@ async function createEventHandler() {
     alert('Error creating event')
   }
 }
+
 
 async function createMeetingHandler() {
   try {
