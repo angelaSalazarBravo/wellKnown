@@ -10,6 +10,9 @@
         <p><strong>Role:</strong> {{ user.role }}</p>
       </div>
     </div>
+    <button @click="logout" class="btn-add mt-2">
+      Logout
+    </button>
 
     <div v-if="user?.role === 'admin'" class="mt-8">
       <Header title="Users" />
@@ -114,6 +117,12 @@ const newUser = ref({
   password: '',
   role: 'worker'
 })
+const logout = () => {
+  localStorage.removeItem('user')
+  localStorage.removeItem('token') 
+  router.push('/login')
+}
+
 
 onMounted(async () => {
   isLoading.value = true

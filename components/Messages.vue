@@ -8,7 +8,7 @@
     </div>
     <form @submit.prevent="submitMessage" class="message-form">
       <textarea v-model="newMessage" placeholder="Comment here" required></textarea>
-      <button type="submit">Enviar</button>
+      <button type="submit">Submit</button>
     </form>
   </div>
 </template>
