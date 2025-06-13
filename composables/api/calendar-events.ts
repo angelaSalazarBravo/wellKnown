@@ -1,6 +1,6 @@
 export const useCalendarEventsApi = () => {
   const getCalendarEvents = async (projectId?: number) => {
-    let url = 'http://localhost:8000/api/calendar-events'
+    let url = 'http://localhost:8001/api/calendar-events'
     if (projectId) {
       url += `?project_id=${projectId}`
     }
@@ -27,7 +27,7 @@ export const useCalendarEventsApi = () => {
   }) => {
     const token = localStorage.getItem('authToken')
 
-    const response = await $fetch('http://localhost:8000/api/calendar-events', {
+    const response = await $fetch('http://localhost:8001/api/calendar-events', {
       method: 'POST',
       body: event,
       headers: {

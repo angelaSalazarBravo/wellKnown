@@ -3,7 +3,7 @@ export const useMessagesApi = () => {
     const token = localStorage.getItem('authToken')
     if (!token) throw new Error('No token found')
 
-    return await $fetch(`http://localhost:8000/api/messages?project_id=${projectId}`, {
+    return await $fetch(`http://localhost:8001/api/messages?project_id=${projectId}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -16,7 +16,7 @@ export const useMessagesApi = () => {
     const token = localStorage.getItem('authToken')
     if (!token) throw new Error('No token found')
 
-    return await $fetch('http://localhost:8000/api/messages', {
+    return await $fetch('http://localhost:8001/api/messages', {
       method: 'POST',
       body: payload,
       headers: {

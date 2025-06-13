@@ -5,7 +5,7 @@ export const useProjectsApi = () => {
     if (!token) {
       throw new Error('No token found in localStorage')
     }
-    const response = await $fetch('http://localhost:8000/api/projects', {
+    const response = await $fetch('http://localhost:8001/api/projects', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -18,7 +18,7 @@ export const useProjectsApi = () => {
   const getProjectById = async (id: number) => {
     const token = localStorage.getItem('authToken')
     if (!token) throw new Error('No token found')
-    return $fetch(`http://localhost:8000/api/projects/${id}`, {
+    return $fetch(`http://localhost:8001/api/projects/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
   }
@@ -27,7 +27,7 @@ export const useProjectsApi = () => {
     const token = localStorage.getItem('authToken')
     if (!token) throw new Error('No token found')
 
-    return await $fetch('http://localhost:8000/api/projects', {
+    return await $fetch('http://localhost:8001/api/projects', {
       method: 'POST',
       body: projectData,
       headers: {
@@ -40,7 +40,7 @@ export const useProjectsApi = () => {
   const token = localStorage.getItem('authToken')
     if (!token) throw new Error('No token found')
 
-    return await $fetch('http://localhost:8000/api/user-projects', {
+    return await $fetch('http://localhost:8001/api/user-projects', {
       method: 'POST',
       body: { userId: userId, projectId: projectId },
       headers: {
@@ -53,7 +53,7 @@ const getMyProjects = async () => {
   const token = localStorage.getItem('authToken')
   if (!token) throw new Error('No token found')
 
-  return await $fetch('http://localhost:8000/api/my-projects', {
+  return await $fetch('http://localhost:8001/api/my-projects', {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ const updateProject = async (id: number, updatedData: Record<string, any>) => {
   const token = localStorage.getItem('authToken')
   if (!token) throw new Error('No token found')
 
-  return await $fetch(`http://localhost:8000/api/projects/${id}`, {
+  return await $fetch(`http://localhost:8001/api/projects/${id}`, {
     method: 'PUT',
     body: updatedData,
     headers: {

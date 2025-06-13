@@ -11,7 +11,7 @@ export const useUsersApi = () => {
   }
 
   const getUsers = async () => {
-    const { data, error } = await useFetch(`${baseURL}/users`, {
+    const { data, error } = await useFetch(`http://localhost:8001/api/users`, {
       method: 'GET',
       headers: getAuthHeaders()
     })
@@ -19,7 +19,7 @@ export const useUsersApi = () => {
   }
 
   const getUser = async (id: number | string) => {
-    const { data, error } = await useFetch(`${baseURL}/users/${id}`, {
+    const { data, error } = await useFetch(`http://localhost:8001/api/users/${id}`, {
       method: 'GET',
       headers: getAuthHeaders()
     })
@@ -27,7 +27,7 @@ export const useUsersApi = () => {
   }
 
   const createUser = async (userData: Record<string, any>) => {
-    const { data, error } = await useFetch(`${baseURL}/users`, {
+    const { data, error } = await useFetch(`http://localhost:8001/api/users`, {
       method: 'POST',
       body: userData,
       headers: getAuthHeaders()
@@ -36,7 +36,7 @@ export const useUsersApi = () => {
   }
 
   const updateUser = async (id: number | string, userData: Record<string, any>) => {
-    const { data, error } = await useFetch(`${baseURL}/users/${id}`, {
+    const { data, error } = await useFetch(`http://localhost:8001/api/users/${id}`, {
       method: 'PUT',
       body: userData,
       headers: getAuthHeaders()
@@ -45,7 +45,7 @@ export const useUsersApi = () => {
   }
 
   const deleteUser = async (id: number | string) => {
-    const { data, error } = await useFetch(`${baseURL}/users/${id}`, {
+    const { data, error } = await useFetch(`http://localhost:8001/api/users/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders()
     })
@@ -53,7 +53,7 @@ export const useUsersApi = () => {
   }
 
 const loginUser = async (email: string, password: string) => {
-  const { data, error } = await useFetch(`${baseURL}/login`, {
+  const { data, error } = await useFetch(`http://localhost:8001/api/login`, {
     method: 'POST',
     body: { email, password }
   })
@@ -73,7 +73,7 @@ const loginUser = async (email: string, password: string) => {
 
 
   const registerUser = async (name: string, email: string, password: string) => {
-    const { data, error } = await useFetch(`${baseURL}/register`, {
+    const { data, error } = await useFetch(`http://localhost:8001/api/register`, {
       method: 'POST',
       body: { name, email, password }
     })
