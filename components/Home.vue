@@ -317,7 +317,6 @@ onMounted(async () => {
 
 
 .slider-btn:hover {
-  background: linear-gradient(145deg, #356a95, #2a5480);
   transform: scale(1.1);
 }
 
