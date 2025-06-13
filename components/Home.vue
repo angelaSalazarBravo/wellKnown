@@ -302,19 +302,19 @@ onMounted(async () => {
 }
 
 .slider-btn {
-  background: linear-gradient(145deg, #4a90e2, #357ABD);
+  background: transparent;
   border: none;
-  color: white;
+  color: rgb(45, 41, 88);
   font-size: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 6px 16px;
-  border-radius: 50%;
   cursor: pointer;
   user-select: none;
   z-index: 10;
 }
+
 
 .slider-btn:hover {
   background: linear-gradient(145deg, #356a95, #2a5480);
