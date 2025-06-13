@@ -79,6 +79,27 @@ const loginUser = async (email: string, password: string) => {
     })
     return { data, error }
   }
+  const generateResetToken = async (email: string) => {
+  const { data, error } = await useFetch(`http://localhost:8001/api/generate-reset-token`, {
+    method: 'POST',
+    body: { email }
+  })
+
+    return { data, error }
+  }
+
+  const resetPasswordRequest = async (payload: {
+    email: string
+    password: string
+    password_confirmation: string
+    token: string
+  }) => {
+    const { data, error } = await useFetch(`http://localhost:8001/api/regenerate-password`, {
+      method: 'POST',
+      body: payload
+    })
+    return { data, error }
+  }
 
   return {
     getUsers,
@@ -87,6 +108,8 @@ const loginUser = async (email: string, password: string) => {
     updateUser,
     deleteUser,
     loginUser,
-    registerUser
+    registerUser,
+    generateResetToken,
+    resetPasswordRequest
   }
 }
