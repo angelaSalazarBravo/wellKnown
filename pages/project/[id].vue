@@ -33,8 +33,8 @@
               <Header :title="project.name" />
               <p>{{ project.description }}</p>
               <p>
-                <strong>Inicio:</strong> {{ formatDate(project.start_date) }}
-                <strong>Fin:</strong> {{ formatDate(project.end_date) }}
+                <strong>Start:</strong> {{ formatDate(project.start_date) }}
+                <strong>End:</strong> {{ formatDate(project.end_date) }}
               </p>
               <button @click="editMode = true" class="edit-btn">Edit Project</button>
             </div>
