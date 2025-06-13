@@ -284,7 +284,9 @@ onMounted(async () => {
   padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 5px;
-  margin: 1rem 2.5rem;
+  margin-top: 1rem;
+  margin-left: 3rem;
+  margin-right  : 1rem;
   cursor: pointer;
   font-weight: bold;
   transition: background-color 0.3s ease;
